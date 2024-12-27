@@ -3,6 +3,7 @@ plugins {
     `kotlin-dsl-precompiled-script-plugins`
     id("com.gradle.plugin-publish") version "1.3.0"
     kotlin("plugin.serialization") version embeddedKotlinVersion
+    id("com.gradleup.shadow") version "9.0.0-beta4"
 }
 
 java {
@@ -22,6 +23,12 @@ dependencies {
 }
 
 // <editor-fold desc="Publishing">
+tasks.shadowJar {
+    archiveClassifier.set(null as String?)
+    minimize()
+    mergeServiceFiles()
+}
+
 val isSnapshot = version.toString().endsWith("SNAPSHOT")
 
 publishing {
