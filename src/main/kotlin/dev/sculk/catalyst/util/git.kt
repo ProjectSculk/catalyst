@@ -157,7 +157,7 @@ fun git(function: GitBuilder.() -> Unit) {
     redirect(process.errorStream, if (builder.silentErr) NullPrintStream() else System.err)
 
     val exitCode = process.waitFor()
-    if (exitCode != 0) {
+    if (exitCode != 0 && !builder.silentErr) {
         throw RuntimeException("git process ended with $exitCode exit code.")
     }
 }
