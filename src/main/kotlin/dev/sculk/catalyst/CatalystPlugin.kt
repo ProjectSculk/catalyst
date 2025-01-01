@@ -115,7 +115,7 @@ class CatalystPlugin : Plugin<Project> {
                 filter.set(Predicate { it.extension != "java" && it.extension != "class" && !it.toString().contains("META-INF/") })
             }
 
-            val applySourcePatches by target.tasks.registering(ApplyPatches::class) {
+            val applySourceFilePatches by target.tasks.registering(ApplyFilePatches::class) {
                 dependsOn(setupJavaSources)
                 group = "catalyst"
                 
@@ -123,8 +123,16 @@ class CatalystPlugin : Plugin<Project> {
                 patches.set(setupJavaSources.flatMap { it.patchesDir })
                 rejects.set(target.layout.buildDirectory.dir("rejects/sources"))
             }
+            
+            val applyFeaturePatches by target.tasks.registering(ApplyFeaturePatches::class) {
+                dependsOn(applySourceFilePatches)
+                group = "catalyst"
+                
+                output.set(setupJavaSources.flatMap { it.outputDir })
+                patchDir.set(catalyst.serverProject.map { it.layout.projectDirectory.dir("patches/features") })
+            }
 
-            val applyResourcePatches by target.tasks.registering(ApplyPatches::class) {
+            val applyResourcePatches by target.tasks.registering(ApplyFilePatches::class) {
                 dependsOn(setupResources)
                 group = "catalyst"
                 
@@ -133,31 +141,49 @@ class CatalystPlugin : Plugin<Project> {
                 rejects.set(target.layout.buildDirectory.dir("rejects/resources"))
             }
 
-            val rebuildSourcePatches by target.tasks.registering(RebuildPatches::class) {
+            val rebuildSourceFilePatches by target.tasks.registering(RebuildFilePatches::class) {
                 group = "catalyst"
                 inputDir.set(catalyst.serverProject.map { it.layout.projectDirectory.dir(INTERNAL_JAVA_SOURCE_SET) })
                 patchDir.set(catalyst.serverProject.map { it.layout.projectDirectory.dir("patches/files") })
                 accessTransforms.set(catalyst.accessTransformers)
                 base.set(target.gradleFile("caches/sources"))
             }
+            
+            val rebuildFeaturePatches by target.tasks.registering(RebuildFeaturePatches::class) {
+                group = "catalyst"
+                inputDir.set(catalyst.serverProject.map { it.layout.projectDirectory.dir(INTERNAL_JAVA_SOURCE_SET) })
+                patchDir.set(catalyst.serverProject.map { it.layout.projectDirectory.dir("patches/features") })
+            }
 
-            val rebuildResourcePatches by target.tasks.registering(RebuildPatches::class) {
+            val rebuildResourcePatches by target.tasks.registering(RebuildFilePatches::class) {
                 group = "catalyst"
                 inputDir.set(catalyst.serverProject.map { it.layout.projectDirectory.dir(INTERNAL_RESOURCES_SOURCE_SET) })
                 patchDir.set(catalyst.serverProject.map { it.layout.projectDirectory.dir("patches/resources") })
                 base.set(target.gradleFile("caches/resources"))
             }
 
-            target.tasks.create("applyAllPatches") {
+            val applyFilePatches = target.tasks.create("applyFilePatches") {
                 group = "catalyst"
-                description = "Applies patches to minecraft resources and sources"
-                dependsOn(applyResourcePatches, applySourcePatches)
+                description = "Applies all file patches to minecraft resources and sources"
+                dependsOn(applyResourcePatches, applySourceFilePatches)
             }
 
+            val rebuildFilePatches = target.tasks.create("rebuildFilePatches") {
+                group = "catalyst"
+                description = "Rebuilds all file patches for minecraft resources and sources"
+                dependsOn(rebuildResourcePatches, rebuildSourceFilePatches)
+            }
+            
+            target.tasks.create("applyAllPatches") {
+                group = "catalyst"
+                description = "Applies both file and feature patches"
+                dependsOn(applyFilePatches, applyFeaturePatches)
+            }
+            
             target.tasks.create("rebuildAllPatches") {
                 group = "catalyst"
-                description = "Rebuilds all patches for minecraft resources and sources"
-                dependsOn(rebuildResourcePatches, rebuildSourcePatches)
+                description = "Rebuilds all patches"
+                dependsOn(rebuildFilePatches, rebuildFeaturePatches)
             }
             // </editor-fold>
             

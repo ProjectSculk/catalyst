@@ -15,7 +15,7 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import java.io.PrintStream
 
-abstract class ApplyPatches : BaseTask() {
+abstract class ApplyFilePatches : BaseTask() {
     @get:OutputDirectory
     abstract val outputDir: DirectoryProperty
     
@@ -49,7 +49,7 @@ abstract class ApplyPatches : BaseTask() {
             .operate()
 
         val git = Git.open(outputDir.file)
-        commitAndTag(git, "patched", "apply patches")
+        commitAndTag(git, "file", "apply patches")
         git.close()
         
         if (result.exit != 0) {
