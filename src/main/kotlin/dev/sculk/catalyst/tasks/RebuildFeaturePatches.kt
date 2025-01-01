@@ -28,8 +28,8 @@ abstract class RebuildFeaturePatches : BaseTask() {
             "-o", patchDir.path.absolutePath,
             "file"
         )
-        git("tag", "-d", "feature")
-        git("tag", "feature")
+        git("tag", "-d", "feature", silent = true)
+        git("tag", "feature", silent = true)
     }
 
     private fun git(vararg args: String, silent: Boolean = false) = git {

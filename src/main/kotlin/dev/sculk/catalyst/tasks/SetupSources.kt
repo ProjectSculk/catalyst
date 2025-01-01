@@ -145,11 +145,12 @@ abstract class SetupSources : BaseTask() {
             commitAndTag(git, "MCDev", "library imports")
         }
         
-        try {
-            base.path.deleteRecursively()
-            base.path.createDirectories() 
-        } catch (ignored: Exception) {}
-        output.copyToRecursively(base.path, overwrite = true, followLinks = false)
+        val basePath = base.path
+        if (basePath.notExists()) {
+            basePath.deleteRecursively()
+            basePath.createDirectories()
+            output.copyToRecursively(basePath, overwrite = true, followLinks = false)
+        }
         
         git.close()
     }

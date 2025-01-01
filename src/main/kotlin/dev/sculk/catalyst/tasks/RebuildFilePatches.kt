@@ -50,7 +50,7 @@ abstract class RebuildFilePatches : BaseTask() {
             git.close()
         }
         
-        git("reset", "--hard", "file")
+        git("reset", "--hard", "file", silent = true)
         
         val printStream = PrintStream(LoggingOutputStream(logger, LogLevel.LIFECYCLE))
         val result = DiffOperation.builder()
@@ -62,6 +62,9 @@ abstract class RebuildFilePatches : BaseTask() {
             .level(codechicken.diffpatch.util.LogLevel.INFO)
             .lineEnding("\n")
             .ignorePrefix(".git")
+            .ignorePrefix("data/minecraft/structure")
+            .ignorePrefix("data/.mcassetsroot")
+            .ignorePrefix("assets/.mcassetsroot")
             .context(contextLines.get())
             .summary(false)
             .build()
