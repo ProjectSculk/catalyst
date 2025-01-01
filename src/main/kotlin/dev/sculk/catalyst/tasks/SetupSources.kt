@@ -149,6 +149,8 @@ abstract class SetupSources : BaseTask() {
         if (basePath.notExists()) {
             basePath.deleteRecursively()
             basePath.createDirectories()
+        }
+        if (basePath.listDirectoryEntries().isEmpty()) {
             output.copyToRecursively(basePath, overwrite = true, followLinks = false)
         }
         
