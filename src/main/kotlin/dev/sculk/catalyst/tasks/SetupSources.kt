@@ -145,8 +145,10 @@ abstract class SetupSources : BaseTask() {
             commitAndTag(git, "MCDev", "library imports")
         }
         
-        base.path.deleteRecursively()
-        base.path.createDirectories()
+        try {
+            base.path.deleteRecursively()
+            base.path.createDirectories() 
+        } catch (ignored: Exception) {}
         output.copyToRecursively(base.path, overwrite = true, followLinks = false)
         
         git.close()
