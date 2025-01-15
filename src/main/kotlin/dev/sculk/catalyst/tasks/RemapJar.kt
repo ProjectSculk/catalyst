@@ -53,14 +53,14 @@ abstract class RemapJar : BaseTask() {
                 
                 remapperArgs.get().forEach { arg ->
                     args(arg
-                        .replace(Regex("\\{tempDir}")) { project.buildDirectory.resolve(".tmp_codebook").absolutePath }
+                        .replace(Regex("\\{tempDir}")) { temporaryDir.resolve(".tmp_codebook").absolutePath }
                         .replace(Regex("\\{remapperFile}")) { remapper.singleFile.absolutePath }
                         .replace(Regex("\\{mappingsFile}")) { mappings.path.absolutePath }
                         .replace(Regex("\\{paramsFile}")) { paramMappings.singleFile.absolutePath }
                         .replace(Regex("\\{input}")) { inputJar.path.absolutePath }
                         .replace(Regex("\\{output}")) { outputJar.path.absolutePath }
                         .replace(Regex("\\{inputClasspath}")) { minecraftLibraries.files.joinToString(":") { it.absolutePath } }
-                        .replace(Regex("\\{reportsDir}")) { project.buildDirectory.resolve("reports").absolutePath })
+                        .replace(Regex("\\{reportsDir}")) { temporaryDir.resolve("reports").absolutePath })
                 }
             }
         }

@@ -37,7 +37,9 @@ object McDev {
                         .forEach { result ->
                             add(
                                 LibrarySource(
-                                    name = result.id.displayName,
+                                    name = result.id.displayName
+                                        .substringAfter(":")
+                                        .substringBeforeLast(":"),
                                     path = result.file.toPath()
                                 )
                             )
